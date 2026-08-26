@@ -2,184 +2,187 @@ import java.util.Scanner;
 
 public class Main {
 
-  // 📌 Lista de códigos dos clientes já cadastrados
-  static int[] clientes = {1001, 1002, 1003};
+    // Lista de códigos dos clientes cadastrados
+    static int[] clientes = {1001, 1002, 1003};
 
-  // 📌 Descontos correspondentes a cada cliente (mesmo índice do array clientes)
-  static int[] descontos = {10, 50, 10};
+    // Descontos correspondentes a cada cliente
+    static int[] descontos = {10, 50, 10};
 
-  // 📌 Lista de pizzas disponíveis
-  static String[] pizzas = {
-          "Mussarela", "Calabresa", "Frango", "Quatro Queijos",
-          "Portuguesa", "Bacon", "Napolitana", "Marguerita",
-          "Pepperoni", "Palmito", "Atum", "Frango Catupiry",
-          "Vegetariana", "Especial", "Cheddar"
-  };
+    // Lista de pizzas disponíveis
+    static String[] pizzas = {
+        "Mussarela", "Calabresa", "Frango", "Quatro Queijos",
+        "Portuguesa", "Bacon", "Napolitana", "Marguerita",
+        "Pepperoni", "Palmito", "Atum", "Frango Catupiry",
+        "Vegetariana", "Especial", "Cheddar"
+    };
 
-  // 📌 Preços das pizzas (mesmo índice do array pizzas)
-  static double[] precos = {
-          35, 40, 42, 45,
-          48, 50, 38, 36,
-          55, 37, 41, 47,
-          39, 60, 44
-  };
+    // Preços correspondentes a cada pizza
+    static double[] precos = {
+        35, 40, 42, 45,
+        48, 50, 38, 36,
+        55, 37, 41, 47,
+        39, 60, 44
+    };
 
-  // 📌 Vetor que guarda os pedidos (índices das pizzas escolhidas)
-  static int[] pedido = new int[10];
+    // Armazena os índices das pizzas selecionadas no pedido
+    static int[] pedido = new int[10];
 
-  // 📌 Controla quantas pizzas já foram adicionadas no pedido
-  static int quantidadePedido = 0;
+    // Controla a quantidade de pizzas adicionadas ao pedido
+    static int quantidadePedido = 0;
 
-  public static void main(String[] args) {
+    public static void main(String[] args) {
 
-    Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in);
 
-    // 📌 Solicita código do cliente
-    System.out.println("Digite seu código de cliente:");
-    int codigo = sc.nextInt();
+        // Solicita o código do cliente
+        System.out.println("Digite seu código de cliente:");
+        int codigo = sc.nextInt();
 
-    // 📌 Busca se o cliente existe e pega o desconto dele
-    int descontoCliente = buscarDesconto(codigo);
+        // Busca o desconto correspondente ao cliente
+        int descontoCliente = buscarDesconto(codigo);
 
-    // 📌 Se cliente não existir (-1), cadastra como novo
-    if (descontoCliente == -1) {
-      descontoCliente = 0; // sem desconto agora
+        // Caso o cliente não esteja cadastrado, realiza o cadastro
+        if (descontoCliente == -1) {
+            descontoCliente = 0;
 
-      // adiciona cliente novo no sistema
-      clientes = cadastrarCliente(codigo, clientes);
+            clientes = cadastrarCliente(codigo, clientes);
+            descontos = cadastrarDesconto(descontos, 10);
 
-      // adiciona desconto padrão de 10% para próxima compra
-      descontos = cadastrarDesconto(descontos, 10);
+            System.out.println(
+                "Cliente novo cadastrado com 10% de desconto para a próxima compra."
+            );
+        }
 
-      System.out.println("Cliente novo cadastrado com 10% de desconto para próxima compra.");
+        int opcao;
+
+        // Permite selecionar várias pizzas
+        do {
+            mostrarMenu();
+
+            System.out.println("Escolha uma pizza:");
+            opcao = sc.nextInt();
+
+            // Verifica se a opção selecionada é válida
+            if (opcao >= 0 && opcao < pizzas.length) {
+                adicionarPedido(opcao);
+            }
+
+            System.out.println("Deseja mais uma pizza? (1 - Sim / 0 - Não)");
+
+        } while (sc.nextInt() == 1);
+
+        // Calcula o valor total sem desconto
+        double total = calcularTotal();
+
+        // Aplica o desconto correspondente ao cliente
+        double totalComDesconto =
+            total * (1 - descontoCliente / 100.0);
+
+        // Exibe o resumo do pedido
+        System.out.println("\n--- RESUMO DO PEDIDO ---");
+
+        mostrarPedido();
+
+        System.out.println("Total sem desconto: R$ " + total);
+        System.out.println("Desconto: " + descontoCliente + "%");
+        System.out.println("Total final: R$ " + totalComDesconto);
+
+        sc.close();
     }
 
-    int opcao;
+    // Exibe o cardápio de pizzas
+    static void mostrarMenu() {
+        System.out.println("\n--- CARDÁPIO ---");
 
-    // 📌 Loop para escolher várias pizzas
-    do {
-      mostrarMenu(); // mostra cardápio
-
-      System.out.println("Escolha uma pizza:");
-      opcao = sc.nextInt();
-
-      // 📌 Verifica se opção é válida
-      if (opcao >= 0 && opcao < pizzas.length) {
-        adicionarPedido(opcao); // adiciona pizza no pedido
-      }
-
-      System.out.println("Deseja mais uma pizza? (1 sim / 0 não)");
-
-    } while (sc.nextInt() == 1);
-
-    // 📌 Calcula valor total sem desconto
-    double total = calcularTotal();
-
-    // 📌 Aplica desconto do cliente
-    double totalComDesconto = total * (1 - descontoCliente / 100.0);
-
-    // 📌 Mostra resumo final
-    System.out.println("\n--- RESUMO DO PEDIDO ---");
-
-    mostrarPedido(); // mostra pizzas escolhidas
-
-    System.out.println("Total sem desconto: R$ " + total);
-    System.out.println("Desconto: " + descontoCliente + "%");
-    System.out.println("Total final: R$ " + totalComDesconto);
-  }
-
-  // 🍕 MOSTRA O CARDÁPIO DE PIZZAS
-  static void mostrarMenu() {
-    System.out.println("\n--- CARDÁPIO ---");
-
-    for (int i = 0; i < pizzas.length; i++) {
-      System.out.println(i + " - " + pizzas[i] + " R$ " + precos[i]);
-    }
-  }
-
-  // ➕ ADICIONA UMA PIZZA NO PEDIDO
-  static void adicionarPedido(int opcao) {
-
-    // salva o índice da pizza escolhida
-    pedido[quantidadePedido] = opcao;
-
-    // aumenta quantidade de itens no pedido
-    quantidadePedido++;
-  }
-
-  // 🧾 MOSTRA O PEDIDO COMPLETO
-  static void mostrarPedido() {
-
-    // percorre todas as pizzas escolhidas
-    for (int i = 0; i < quantidadePedido; i++) {
-
-      int p = pedido[i]; // pega índice da pizza
-
-      // mostra nome e preço da pizza
-      System.out.println("- " + pizzas[p] + " R$ " + precos[p]);
-    }
-  }
-
-  // 💰 CALCULA TOTAL DO PEDIDO
-  static double calcularTotal() {
-
-    double total = 0;
-
-    for (int i = 0; i < quantidadePedido; i++) {
-
-      int p = pedido[i];
-
-      // soma preço de cada pizza
-      total += precos[p];
+        for (int i = 0; i < pizzas.length; i++) {
+            System.out.println(
+                i + " - " + pizzas[i] + " R$ " + precos[i]
+            );
+        }
     }
 
-    return total;
-  }
+    // Adiciona uma pizza ao pedido
+    static void adicionarPedido(int opcao) {
 
-  // 🔍 PROCURA CLIENTE E RETORNA DESCONTO
-  static int buscarDesconto(int codigo) {
+        // Armazena o índice da pizza selecionada
+        pedido[quantidadePedido] = opcao;
 
-    for (int i = 0; i < clientes.length; i++) {
-
-      // se encontrar o cliente
-      if (clientes[i] == codigo) {
-        return descontos[i]; // retorna desconto dele
-      }
+        // Atualiza a quantidade de pizzas no pedido
+        quantidadePedido++;
     }
 
-    return -1; // cliente não encontrado
-  }
+    // Exibe todas as pizzas selecionadas
+    static void mostrarPedido() {
 
-  // 🆕 CADASTRA NOVO CLIENTE
-  static int[] cadastrarCliente(int codigo, int[] antigos) {
+        for (int i = 0; i < quantidadePedido; i++) {
 
-    // cria novo array maior
-    int[] novo = new int[antigos.length + 1];
+            int p = pedido[i];
 
-    // copia clientes antigos
-    for (int i = 0; i < antigos.length; i++) {
-      novo[i] = antigos[i];
+            System.out.println(
+                "- " + pizzas[p] + " R$ " + precos[p]
+            );
+        }
     }
 
-    // adiciona novo cliente no final
-    novo[novo.length - 1] = codigo;
+    // Calcula o valor total do pedido
+    static double calcularTotal() {
 
-    return novo;
-  }
+        double total = 0;
 
-  // 🆕 CADASTRA DESCONTO PARA NOVO CLIENTE
-  static int[] cadastrarDesconto(int[] antigos, int desconto) {
+        for (int i = 0; i < quantidadePedido; i++) {
 
-    int[] novo = new int[antigos.length + 1];
+            int p = pedido[i];
 
-    // copia descontos antigos
-    for (int i = 0; i < antigos.length; i++) {
-      novo[i] = antigos[i];
+            total += precos[p];
+        }
+
+        return total;
     }
 
-    // adiciona novo desconto
-    novo[novo.length - 1] = desconto;
+    // Busca o desconto de um cliente pelo código
+    static int buscarDesconto(int codigo) {
 
-    return novo;
-  }
+        for (int i = 0; i < clientes.length; i++) {
+
+            if (clientes[i] == codigo) {
+                return descontos[i];
+            }
+        }
+
+        return -1;
+    }
+
+    // Cadastra um novo cliente
+    static int[] cadastrarCliente(int codigo, int[] antigos) {
+
+        // Cria um novo array com espaço adicional
+        int[] novo = new int[antigos.length + 1];
+
+        // Copia os clientes já cadastrados
+        for (int i = 0; i < antigos.length; i++) {
+            novo[i] = antigos[i];
+        }
+
+        // Adiciona o novo cliente
+        novo[novo.length - 1] = codigo;
+
+        return novo;
+    }
+
+    // Cadastra o desconto de um novo cliente
+    static int[] cadastrarDesconto(int[] antigos, int desconto) {
+
+        // Cria um novo array com espaço adicional
+        int[] novo = new int[antigos.length + 1];
+
+        // Copia os descontos existentes
+        for (int i = 0; i < antigos.length; i++) {
+            novo[i] = antigos[i];
+        }
+
+        // Adiciona o novo desconto
+        novo[novo.length - 1] = desconto;
+
+        return novo;
+    }
 }
