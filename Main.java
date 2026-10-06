@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -20,9 +21,7 @@ public class Main {
         39, 60, 44
     };
 
-    static int[] pedido = new int[10];
-
-    static int quantidadePedido = 0;
+    static ArrayList<Integer> pedido = new ArrayList<>();
 
     public static void main(String[] args) {
 
@@ -87,18 +86,12 @@ public class Main {
     }
 
     static void adicionarPedido(int opcao) {
-
-        pedido[quantidadePedido] = opcao;
-
-        quantidadePedido++;
+        pedido.add(opcao);
     }
 
     static void mostrarPedido() {
 
-        for (int i = 0; i < quantidadePedido; i++) {
-
-            int p = pedido[i];
-
+        for (int p : pedido) {
             System.out.println(
                 "- " + pizzas[p] + " R$ " + precos[p]
             );
@@ -109,10 +102,7 @@ public class Main {
 
         double total = 0;
 
-        for (int i = 0; i < quantidadePedido; i++) {
-
-            int p = pedido[i];
-
+        for (int p : pedido) {
             total += precos[p];
         }
 
